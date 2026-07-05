@@ -28,6 +28,8 @@ def main():
     
     pTime = 0
     prev_zoom_dist = 0
+    fist_time = 0
+    last_right_click_time = 0
     
     print("Starting GesturePilot... Press 'q' to exit.")
     
@@ -80,16 +82,31 @@ def main():
                 cursor.move(smooth_x, smooth_y)
                 dragger.start_drag()
                 
+            elif current_gesture == "Right_Click":
+                # Move cursor and right click (with cooldown)
+                cursor.move(smooth_x, smooth_y)
+                dragger.stop_drag()
+                if time.time() - last_right_click_time > 1.0:
+                    import pyautogui
+                    pyautogui.rightClick()
+                    last_right_click_time = time.time()
+                
             elif current_gesture == "Open_Palm":
                 # Pause / Ignore commands
                 dragger.stop_drag()
                 is_paused = True
                             
             elif current_gesture == "Closed_Fist":
-                # Safe exit
+                # Safe exit requires holding for 2 seconds to prevent accidental closing
                 dragger.stop_drag()
-                print("Closed Fist detected. Exiting gracefully...")
-                break
+                if fist_time == 0:
+                    fist_time = time.time()
+                elif time.time() - fist_time > 2.0:
+                    print("Closed Fist held for 2 seconds. Exiting gracefully...")
+                    break
+                else:
+                    cv2.putText(img, "Hold Fist to Exit...", (config.CAMERA_WIDTH // 2 - 200, config.CAMERA_HEIGHT // 2), 
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
                 
             elif current_gesture == "Peace":
                 dragger.stop_drag()
@@ -110,6 +127,10 @@ def main():
                 # Unhandled gesture, release drag and reset zoom state
                 dragger.stop_drag()
                 prev_zoom_dist = 0
+                
+            # Reset fist timer if not currently making a fist
+            if current_gesture != "Closed_Fist":
+                fist_time = 0
                 
         # Draw UI Dashboard
         img = dashboard.draw(img, fps, current_gesture, is_paused)

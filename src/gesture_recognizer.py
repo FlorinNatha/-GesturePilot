@@ -55,6 +55,18 @@ class GestureRecognizer:
         distance = calculate_distance(thumb_tip, index_tip)
         return distance, thumb_tip, index_tip
 
+    def get_middle_pinch_distance(self, landmarks):
+        """
+        Calculate the distance between thumb tip and middle finger tip for Right Click.
+        """
+        if not landmarks or len(landmarks) < 21:
+            return 0.0
+            
+        thumb_tip = (landmarks[4]['cx'], landmarks[4]['cy'])
+        middle_tip = (landmarks[12]['cx'], landmarks[12]['cy'])
+        
+        return calculate_distance(thumb_tip, middle_tip)
+
     def recognize(self, landmarks):
         """
         Identify the current gesture based on landmarks and fingers up.
@@ -65,13 +77,18 @@ class GestureRecognizer:
             
         fingers = self.fingers_up(landmarks)
         pinch_dist, _, _ = self.get_pinch_distance(landmarks)
+        middle_pinch_dist = self.get_middle_pinch_distance(landmarks)
         
         raw_gesture = "None"
         
         # State Machine Logic
-        # 1. Pinch Gesture (Thumb and Index close, others down)
+        # 1. Pinch Gesture (Left Click - Thumb and Index close, others down)
         if pinch_dist < 40 and fingers[2] == 0 and fingers[3] == 0 and fingers[4] == 0:
             raw_gesture = "Pinch"
+            
+        # 1.5 Right Click (Thumb and Middle close)
+        elif middle_pinch_dist < 40 and fingers[3] == 0 and fingers[4] == 0:
+            raw_gesture = "Right_Click"
             
         # 2. Open Palm (All fingers up)
         elif fingers == [1, 1, 1, 1, 1]:

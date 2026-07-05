@@ -33,13 +33,13 @@ The project demonstrates the integration of computer vision, gesture recognition
 - ✋ Real-time hand tracking
 - 🎯 21-point hand landmark detection
 - 🖱️ Smooth cursor movement
-- 👆 Left-click gesture
+- 👆 Left-click gesture (Index Pinch)
+- 🖱️ Right-click gesture (Middle Pinch)
 - 🤏 Click-and-drag gesture
-- 🔍 Zoom in / Zoom out support
-- 🌎 Interactive application navigation
-- 📊 Live gesture dashboard
-- ⚡ Cursor smoothing for stable movement
-- 🔒 Gesture cooldown to reduce false triggers
+- 🔍 Zoom in / Zoom out support (Scrolling)
+- 📊 Live HUD gesture dashboard (FPS, State, Active Gesture)
+- ⚡ Cursor smoothing using Exponential Moving Average
+- 🔒 Gesture cooldowns & safety delays (e.g., 2-second exit hold)
 - 🖥️ Modular architecture for future extensions
 
 ---
@@ -50,11 +50,11 @@ The project demonstrates the integration of computer vision, gesture recognition
 |----------|--------|
 | ☝️ Index Finger | Move Cursor |
 | 🤏 Thumb + Index Pinch | Left Click |
-| 🤏 Hold Pinch | Click and Drag |
-| ✌️ Index + Middle Fingers | Zoom In / Zoom Out |
-| 🖐️ Open Palm | Rotate / Navigate Supported Applications |
-| ✋ Five Fingers Spread | Pause Controls |
-| ✊ Closed Fist | Exit Application |
+| 🤏 Hold Index Pinch | Click and Drag |
+| 🤏 Thumb + Middle Pinch | Right Click |
+| ✌️ Index + Middle Fingers | Zoom In / Zoom Out (Scroll) |
+| 🖐️ Open Palm | Pause Controls |
+| ✊ Hold Closed Fist (2s)| Safely Exit Application |
 
 ---
 

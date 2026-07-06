@@ -30,6 +30,7 @@ def main():
     prev_zoom_dist = 0
     fist_time = 0
     last_right_click_time = 0
+    frame_margin = 150 # Margin for active tracking zone
     
     print("Starting GesturePilot... Press 'q' to exit.")
     
@@ -63,11 +64,10 @@ def main():
             index_x = landmarks[8]['cx']
             index_y = landmarks[8]['cy']
             
-            # Interpolate coordinates to screen size
-            # Since camera feed is horizontally flipped, we might need to map it carefully,
-            # but since we flip the image earlier, index_x is already correct visually.
-            screen_x = np.interp(index_x, (0, config.CAMERA_WIDTH), (0, config.SCREEN_WIDTH))
-            screen_y = np.interp(index_y, (0, config.CAMERA_HEIGHT), (0, config.SCREEN_HEIGHT))
+            # Interpolate coordinates to screen size using the frame margin
+            # This makes it easier to reach the edges of the screen with small hand movements
+            screen_x = np.interp(index_x, (frame_margin, config.CAMERA_WIDTH - frame_margin), (0, config.SCREEN_WIDTH))
+            screen_y = np.interp(index_y, (frame_margin, config.CAMERA_HEIGHT - frame_margin), (0, config.SCREEN_HEIGHT))
             
             # Smooth the movement to prevent jitter
             smooth_x, smooth_y = smoother.smooth(screen_x, screen_y)
@@ -134,8 +134,19 @@ def main():
                 
         # Draw UI Dashboard
         img = dashboard.draw(img, fps, current_gesture, is_paused)
+        
+        # Draw the active tracking area box
+        cv2.rectangle(img, (frame_margin, frame_margin), 
+                     (config.CAMERA_WIDTH - frame_margin, config.CAMERA_HEIGHT - frame_margin), 
+                     (255, 0, 255), 2)
+                     
+        # Resize image for a smaller Picture-in-Picture (PiP) display
+        display_img = cv2.resize(img, (0, 0), fx=0.35, fy=0.35)
                     
-        cv2.imshow("GesturePilot Tracking", img)
+        cv2.imshow("GesturePilot Tracking", display_img)
+        
+        # Ensure the small window stays always on top of other applications
+        cv2.setWindowProperty("GesturePilot Tracking", cv2.WND_PROP_TOPMOST, 1)
         
         # Exit condition
         if cv2.waitKey(1) & 0xFF == ord('q'):

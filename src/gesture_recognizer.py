@@ -82,12 +82,14 @@ class GestureRecognizer:
         raw_gesture = "None"
         
         # State Machine Logic
-        # 1. Pinch Gesture (Left Click - Thumb and Index close, others down)
-        if pinch_dist < 40 and fingers[2] == 0 and fingers[3] == 0 and fingers[4] == 0:
+        
+        # 1. Pinch Gesture (Left Click - Thumb and Index close)
+        # Relaxed threshold to 60, and removed strict checking for other fingers to make it much easier to trigger.
+        if pinch_dist < 60:
             raw_gesture = "Pinch"
             
         # 1.5 Right Click (Thumb and Middle close)
-        elif middle_pinch_dist < 40 and fingers[3] == 0 and fingers[4] == 0:
+        elif middle_pinch_dist < 60 and fingers[1] == 1:
             raw_gesture = "Right_Click"
             
         # 2. Open Palm (All fingers up)
